@@ -3,6 +3,18 @@
     "description": "RuMaxBot — интеграция Laravel 12 с API rumaxbot.ru. Artisan-команда rumaxbot:test для живой проверки, PHPUnit-тесты клиента и команды.",
     "type": "library",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Goncharov Stepan",
+            "email": "in001@z1q.ru",
+            "homepage": "https://wwsite.ru"
+        }
+    ],
+    "homepage": "https://github.com/ww-site/RuMaxBot",
+    "support": {
+        "issues": "https://github.com/ww-site/RuMaxBot/issues",
+        "source": "https://github.com/ww-site/RuMaxBot"
+    },
     "keywords": [
         "laravel",
         "max",

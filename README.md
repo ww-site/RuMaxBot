@@ -2,6 +2,8 @@
 
 Composer-пакет для быстрого подключения **Laravel 12** к API [rumaxbot.ru](https://rumaxbot.ru/) (MAX Messenger).
 
+Репозиторий: [github.com/ww-site/RuMaxBot](https://github.com/ww-site/RuMaxBot)
+
 ## Установка
 
 ```bash
