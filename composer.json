@@ -1,0 +1,49 @@
+{
+    "name": "laracomposer/rumaxbot",
+    "description": "RuMaxBot — быстрая интеграция Laravel 12 с API rumaxbot.ru (MAX Messenger)",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "max",
+        "messenger",
+        "rumaxbot",
+        "bot",
+        "notifications"
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/contracts": "^12.0",
+        "illuminate/http": "^12.0",
+        "illuminate/support": "^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "RuMaxBot\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "RuMaxBot\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "RuMaxBot\\RuMaxBotServiceProvider"
+            ],
+            "aliases": {
+                "RuMaxBot": "RuMaxBot\\Facades\\RuMaxBot"
+            }
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
