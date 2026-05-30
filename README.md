@@ -7,7 +7,7 @@ Composer-пакет для быстрого подключения **Laravel 12*
 ## Установка
 
 ```bash
-composer require laracomposer/rumaxbot
+composer require ww-site/rumaxbot
 ```
 
 Для локальной разработки из этого репозитория:
@@ -21,7 +21,7 @@ composer require laracomposer/rumaxbot
         }
     ],
     "require": {
-        "laracomposer/rumaxbot": "@dev"
+        "ww-site/rumaxbot": "@dev"
     }
 }
 ```

@@ -1,5 +1,5 @@
 {
-    "name": "laracomposer/rumaxbot",
+    "name": "ww-site/rumaxbot",
     "description": "RuMaxBot — интеграция Laravel 12 с API rumaxbot.ru. Artisan-команда rumaxbot:test для живой проверки, PHPUnit-тесты клиента и команды.",
     "type": "library",
     "license": "MIT",
