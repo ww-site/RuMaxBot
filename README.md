@@ -127,28 +127,53 @@ final readonly class DeployNotifier
 }
 ```
 
-## Тесты
+## Тестирование
 
-### В Laravel-проекте (после `composer require`)
+Пакет поставляется с **явными тестами** на двух уровнях.
 
-Автотесты с моком HTTP — без реального API:
+### Живая проверка после установки
 
-```bash
-php artisan test --filter RuMaxBot
-```
-
-Или:
+Отправка **реального** сообщения в MAX (нужен `RUMAXBOT_API_TOKEN` в `.env`):
 
 ```bash
-vendor/bin/phpunit --filter RuMaxBot
+php artisan rumaxbot:test
+php artisan rumaxbot:test --message="Привет из Laravel"
+php artisan rumaxbot:test --message="<b>HTML</b>" --format=html
 ```
 
-### В папке пакета
+Команда: `rumaxbot:test` (`SendTestMessageCommand`).
+
+Успех:
+
+```
+Sending test message via RuMaxBot...
+Message queued successfully. Status: pending
+Message ID: 019e79d1-...
+```
+
+### Автотесты пакета (PHPUnit, без реального API)
+
+HTTP мокается через `Http::fake()` — к rumaxbot.ru запросы не уходят.
 
 ```bash
 composer install
 vendor/bin/phpunit
 ```
+
+| Файл | Покрытие |
+|------|----------|
+| `tests/Unit/RuMaxBotClientTest.php` | клиент: успешная отправка, парсинг `data.status`, ошибка 401, пустой токен, legacy-формат ответа |
+| `tests/Feature/SendTestMessageCommandTest.php` | команда `rumaxbot:test`: успех, `--message`, ошибка API |
+
+### Автотесты в Laravel-проекте
+
+Если в проекте есть `tests/Feature/RuMaxBotTest.php` (как в дистрибутиве laracomposer):
+
+```bash
+php artisan test --filter RuMaxBot
+```
+
+Проверяется регистрация в DI, команда, клиент, ошибки без токена и при 401.
 
 ## Лицензия
 

@@ -1,6 +1,6 @@
 {
     "name": "laracomposer/rumaxbot",
-    "description": "RuMaxBot — быстрая интеграция Laravel 12 с API rumaxbot.ru (MAX Messenger)",
+    "description": "RuMaxBot — интеграция Laravel 12 с API rumaxbot.ru. Artisan-команда rumaxbot:test для живой проверки, PHPUnit-тесты клиента и команды.",
     "type": "library",
     "license": "MIT",
     "keywords": [
