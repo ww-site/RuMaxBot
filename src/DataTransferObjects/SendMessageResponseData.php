@@ -10,5 +10,6 @@ final readonly class SendMessageResponseData
         public string $status,
         public ?string $id = null,
         public ?string $message = null,
+        public ?string $externalMessageId = null,
     ) {}
 }

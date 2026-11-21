@@ -1,0 +1,83 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers;
+
+use App\Models\RuMaxBotMessage;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use RuMaxBot\DataTransferObjects\WebhookCallbackData;
+use RuMaxBot\Enums\MessageStatus;
+use RuMaxBot\Services\WebhookSignatureVerifier;
+
+final class RuMaxBotWebhookController extends Controller
+{
+    public function __invoke(Request $request, WebhookSignatureVerifier $verifier): JsonResponse
+    {
+        $rawBody = $request->getContent();
+        $signature = (string) $request->header('X-MaxBot-Signature', '');
+
+        if (! $verifier->isValid($rawBody, $signature)) {
+            Log::warning('RuMaxBot webhook: invalid signature');
+
+            return response()->json(['message' => 'Invalid signature'], 401);
+        }
+
+        /** @var array<string, mixed> $payload */
+        $payload = $request->json()->all();
+        $event = WebhookCallbackData::fromArray($payload);
+
+        if ($event->event === 'webhook.test') {
+            return response()->json(['ok' => true, 'event' => 'webhook.test']);
+        }
+
+        if ($event->event !== 'message_callback') {
+            return response()->json(['ok' => true, 'ignored' => true]);
+        }
+
+        if ($event->externalMessageId === null || $event->externalMessageId === '') {
+            Log::warning('RuMaxBot webhook: missing external_message_id', [
+                'event' => $event->event,
+            ]);
+
+            return response()->json(['message' => 'external_message_id required'], 422);
+        }
+
+        $message = RuMaxBotMessage::query()
+            ->where('external_message_id', $event->externalMessageId)
+            ->first();
+
+        if ($message === null) {
+            Log::warning('RuMaxBot webhook: message not found', [
+                'external_message_id' => $event->externalMessageId,
+            ]);
+
+            return response()->json(['message' => 'Message not found'], 404);
+        }
+
+        if ($message->status === MessageStatus::Answered) {
+            return response()->json(['ok' => true, 'duplicate' => true]);
+        }
+
+        $callbackPayload = $event->callbackPayload() ?? '';
+        $message->markAnswered($callbackPayload, $event->callbackText());
+
+        // TODO: your business logic by $callbackPayload and $message->context
+        // Example:
+        // match ($callbackPayload) {
+        //     'order:accept' => ...,
+        //     'order:reject' => ...,
+        //     default => null,
+        // };
+
+        Log::info('RuMaxBot webhook: message answered', [
+            'external_message_id' => $message->external_message_id,
+            'callback_payload' => $callbackPayload,
+            'context' => $message->context,
+        ]);
+
+        return response()->json(['ok' => true]);
+    }
+}

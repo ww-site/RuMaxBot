@@ -88,6 +88,7 @@ final readonly class RuMaxBotClient implements RuMaxBotClientInterface
     {
         $status = null;
         $id = null;
+        $externalMessageId = null;
 
         $message = isset($payload['message']) && is_string($payload['message'])
             ? $payload['message']
@@ -104,6 +105,10 @@ final readonly class RuMaxBotClient implements RuMaxBotClientInterface
             if (isset($data['id']) && is_string($data['id'])) {
                 $id = $data['id'];
             }
+
+            if (isset($data['external_message_id']) && is_string($data['external_message_id'])) {
+                $externalMessageId = $data['external_message_id'];
+            }
         }
 
         if ($status === null && isset($payload['status']) && is_string($payload['status'])) {
@@ -118,6 +123,7 @@ final readonly class RuMaxBotClient implements RuMaxBotClientInterface
             status: $status,
             id: $id,
             message: $message,
+            externalMessageId: $externalMessageId,
         );
     }
 }

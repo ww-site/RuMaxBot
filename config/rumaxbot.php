@@ -9,7 +9,8 @@ return [
     | RuMaxBot API base URL
     |--------------------------------------------------------------------------
     |
-    | Базовый URL сервиса rumaxbot.ru без trailing slash.
+    | Production: https://rumaxbot.ru
+    | Without trailing slash.
     |
     */
 
@@ -20,7 +21,7 @@ return [
     | API token
     |--------------------------------------------------------------------------
     |
-    | Bearer-токен вида mbk_... из личного кабинета rumaxbot.ru.
+    | Bearer token (mbk_...) from the rumaxbot.ru personal cabinet.
     |
     */
 
@@ -33,5 +34,16 @@ return [
     */
 
     'timeout' => (int) env('RUMAXBOT_TIMEOUT', 30),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Outgoing webhook secret
+    |--------------------------------------------------------------------------
+    |
+    | Secret from API key settings. Used to verify X-MaxBot-Signature (HMAC-SHA256).
+    |
+    */
+
+    'webhook_secret' => env('RUMAXBOT_WEBHOOK_SECRET'),
 
 ];
