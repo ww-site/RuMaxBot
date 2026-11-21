@@ -1,6 +1,6 @@
 {
     "name": "ww-site/rumaxbot",
-    "description": "RuMaxBot — интеграция Laravel 12 с API rumaxbot.ru. Artisan-команда rumaxbot:test для живой проверки, PHPUnit-тесты клиента и команды.",
+    "description": "RuMaxBot — Laravel 12 клиент для rumaxbot.ru: сообщения, inline-кнопки, external_message_id, проверка исходящего вебхука, команда rumaxbot:test.",
     "type": "library",
     "license": "MIT",
     "authors": [

@@ -1,0 +1,49 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Example: send a RuMaxBot message and store it for webhook correlation.
+ *
+ * Copy this logic into your service / action — do not use this stub as a route.
+ */
+
+use App\Models\RuMaxBotMessage;
+use Illuminate\Support\Str;
+use RuMaxBot\DataTransferObjects\InlineButton;
+use RuMaxBot\DataTransferObjects\InlineKeyboardAttachment;
+use RuMaxBot\DataTransferObjects\SendMessageData;
+use RuMaxBot\Enums\MessageFormat;
+use RuMaxBot\Enums\MessageStatus;
+use RuMaxBot\Facades\RuMaxBot;
+
+$externalId = (string) Str::uuid();
+
+$message = RuMaxBotMessage::query()->create([
+    'external_message_id' => $externalId,
+    'text' => 'Выберите действие',
+    'format' => MessageFormat::Markdown,
+    'status' => MessageStatus::Queued,
+    'context' => [
+        'order_id' => 123,
+        // your domain data for webhook handling
+    ],
+]);
+
+$response = RuMaxBot::send(new SendMessageData(
+    text: $message->text,
+    format: MessageFormat::Markdown,
+    externalMessageId: $externalId,
+    attachments: [
+        InlineKeyboardAttachment::make([
+            [
+                InlineButton::callback('Принять', 'order:accept'),
+                InlineButton::callback('Отклонить', 'order:reject'),
+            ],
+        ]),
+    ],
+));
+
+$message->forceFill([
+    'rumaxbot_message_id' => $response->id,
+])->save();

@@ -1,0 +1,71 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use RuMaxBot\Enums\MessageFormat;
+use RuMaxBot\Enums\MessageStatus;
+
+/**
+ * Local correlation store for RuMaxBot outbound messages and webhook answers.
+ *
+ * @property int $id
+ * @property string $external_message_id
+ * @property string|null $rumaxbot_message_id
+ * @property string $text
+ * @property string $format
+ * @property string $status
+ * @property array<string, mixed>|null $context
+ * @property string|null $callback_payload
+ * @property string|null $callback_text
+ * @property \Illuminate\Support\Carbon|null $answered_at
+ */
+final class RuMaxBotMessage extends Model
+{
+    /**
+     * @var list<string>
+     */
+    protected $fillable = [
+        'external_message_id',
+        'rumaxbot_message_id',
+        'text',
+        'format',
+        'status',
+        'context',
+        'callback_payload',
+        'callback_text',
+        'answered_at',
+    ];
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'context' => 'array',
+            'answered_at' => 'datetime',
+            'format' => MessageFormat::class,
+            'status' => MessageStatus::class,
+        ];
+    }
+
+    public function markAnswered(string $callbackPayload, ?string $callbackText = null): void
+    {
+        $this->forceFill([
+            'status' => MessageStatus::Answered,
+            'callback_payload' => $callbackPayload,
+            'callback_text' => $callbackText,
+            'answered_at' => now(),
+        ])->save();
+    }
+
+    public function markFailed(): void
+    {
+        $this->forceFill([
+            'status' => MessageStatus::Failed,
+        ])->save();
+    }
+}

@@ -22,6 +22,7 @@ abstract class TestCase extends Orchestra
             'base_url' => 'https://rumaxbot.ru',
             'token' => 'mbk_test_token',
             'timeout' => 30,
+            'webhook_secret' => 'test_webhook_secret',
         ]);
     }
 }

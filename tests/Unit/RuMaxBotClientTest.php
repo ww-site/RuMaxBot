@@ -6,6 +6,8 @@ namespace RuMaxBot\Tests\Unit;
 
 use Illuminate\Support\Facades\Http;
 use RuMaxBot\Contracts\RuMaxBotClientInterface;
+use RuMaxBot\DataTransferObjects\InlineButton;
+use RuMaxBot\DataTransferObjects\InlineKeyboardAttachment;
 use RuMaxBot\DataTransferObjects\SendMessageData;
 use RuMaxBot\Enums\MessageFormat;
 use RuMaxBot\Exceptions\RuMaxBotException;
@@ -16,14 +18,20 @@ final class RuMaxBotClientTest extends TestCase
     /**
      * @return array<string, mixed>
      */
-    private function apiSuccessPayload(): array
+    private function apiSuccessPayload(?string $externalMessageId = null): array
     {
+        $data = [
+            'id' => '019e79d1-5177-7082-9192-64e6a16cbd63',
+            'status' => 'pending',
+        ];
+
+        if ($externalMessageId !== null) {
+            $data['external_message_id'] = $externalMessageId;
+        }
+
         return [
             'message' => 'Message queued successfully.',
-            'data' => [
-                'id' => '019e79d1-5177-7082-9192-64e6a16cbd63',
-                'status' => 'pending',
-            ],
+            'data' => $data,
         ];
     }
 
@@ -48,7 +56,48 @@ final class RuMaxBotClientTest extends TestCase
             return $request->url() === 'https://rumaxbot.ru/api/v1/messages'
                 && $request->hasHeader('Authorization', 'Bearer mbk_test_token')
                 && $request['text'] === 'Deploy succeeded'
-                && $request['format'] === 'markdown';
+                && $request['format'] === 'markdown'
+                && ! isset($request['external_message_id'])
+                && ! isset($request['attachments']);
+        });
+    }
+
+    public function test_send_message_with_buttons_and_external_id(): void
+    {
+        $externalId = '550e8400-e29b-41d4-a716-446655440000';
+
+        Http::fake([
+            'rumaxbot.ru/api/v1/messages' => Http::response($this->apiSuccessPayload($externalId), 202),
+        ]);
+
+        $client = $this->app->make(RuMaxBotClientInterface::class);
+
+        $response = $client->send(new SendMessageData(
+            text: 'Выберите действие',
+            format: MessageFormat::Markdown,
+            externalMessageId: $externalId,
+            attachments: [
+                InlineKeyboardAttachment::make([
+                    [
+                        InlineButton::callback('Принять', 'order:accept'),
+                        InlineButton::callback('Отклонить', 'order:reject'),
+                    ],
+                    [
+                        InlineButton::link('Сайт', 'https://rumaxbot.ru'),
+                    ],
+                ]),
+            ],
+        ));
+
+        $this->assertSame('pending', $response->status);
+        $this->assertSame($externalId, $response->externalMessageId);
+
+        Http::assertSent(function ($request) use ($externalId): bool {
+            return $request['external_message_id'] === $externalId
+                && is_array($request['attachments'])
+                && $request['attachments'][0]['type'] === 'inline_keyboard'
+                && $request['attachments'][0]['payload']['buttons'][0][0]['payload'] === 'order:accept'
+                && $request['attachments'][0]['payload']['buttons'][1][0]['type'] === 'link';
         });
     }
 
